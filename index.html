@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carpool-Campus (Hackathon Demo)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-purple: #6366f1;
+      --primary-purple-bg: #e0e7ff;
+      --accent-green: #10b981;
+      --accent-green-bg: #e6f4ea;
+      --danger-red: #ef4444;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --nav-bg: #f8fafc;
+    }
+
+    body.dark-theme {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --nav-bg: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 1.5rem; transition: background-color 0.3s, color 0.3s; }
+
+    .app-container { width: 100%; max-width: 1100px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); overflow: hidden; }
+
+    /* Top Header Bar */
+    .top-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .brand-section { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 38px; height: 38px; background: var(--primary-purple); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .brand-title { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .demo-badge { background: #e0e7ff; color: #4338ca; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .university-name { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; }
+
+    .header-actions { display: flex; align-items: center; gap: 0.8rem; }
+    .sos-btn { background: var(--danger-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+    .icon-btn { background: var(--nav-bg); border: 1px solid var(--border-color); color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .user-profile { display: flex; align-items: center; gap: 0.6rem; padding-left: 0.5rem; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary-purple); border: 2px solid var(--primary-purple); }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 0.85rem; font-weight: 700; }
+    .verified-tag { font-size: 0.7rem; color: var(--accent-green); font-weight: 600; display: flex; align-items: center; gap: 0.2rem; }
+
+    /* Navigation Tabs */
+    .nav-tabs { background: var(--nav-bg); padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; gap: 0.5rem; overflow-x: auto; }
+    .nav-item { padding: 0.6rem 1.2rem; border-radius: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; transition: all 0.2s; }
+    .nav-item.active { background: var(--card-bg); color: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .badge-count { background: var(--primary-purple); color: white; font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 999px; }
+
+    /* Main Content */
+    .main-content { padding: 2rem; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Spotlight & Cards */
+    .spotlight-tag { color: var(--primary-purple); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .content-heading { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .content-subtext { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .option-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; position: relative; }
+    .card-type-tag { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; }
+    .tag-purple { background: #e0e7ff; color: #4338ca; }
+    .tag-green { background: #d1fae5; color: #065f46; }
+    .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1.25rem; }
+    .icon-purple { background: var(--primary-purple); color: white; }
+    .icon-green { background: var(--accent-green); color: white; border-radius: 50%; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.6rem; }
+    .card-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem; }
+    .card-action { color: var(--primary-purple); font-weight: 700; font-size: 0.9rem; text-decoration: none; cursor: pointer; }
+    .card-action-green { color: var(--accent-green); }
+
+    /* Active Rides Grid */
+    .section-sub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .rides-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+    .ride-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; background: var(--card-bg); }
+    .ride-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .ride-type-badge { font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; }
+    .ride-details { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+    .ride-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
+
+    /* Route Matcher Inputs */
+    .search-card-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; }
+    .search-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600; }
+    .form-group input, .form-group select { width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--nav-bg); color: var(--text-main); font-weight: 600; outline: none; }
+
+    /* Matcher Cards Grid */
+    .matcher-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem; }
+    .matcher-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; background: var(--card-bg); }
+    .matcher-user-header { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+    .matcher-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+    .rating-badge { background: #dcfce7; color: #166534; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; }
+
+    /* Fare Splitter UI Styles */
+    .section-header { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .section-icon { width: 42px; height: 42px; background: var(--primary-purple-bg); color: var(--primary-purple); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .section-title { font-size: 1.35rem; font-weight: 800; color: var(--text-main); }
+    .section-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .field-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; display: block; }
+
+    .transit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media (max-width: 600px) { .transit-grid { grid-template-columns: 1fr; } }
+    .transit-card { border: 1.5px solid var(--border-color); border-radius: 12px; padding: 1.2rem 1rem; text-align: center; cursor: pointer; background: var(--card-bg); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); }
+    .transit-card i { font-size: 1.2rem; }
+    .transit-card.active { border-color: var(--primary-purple); background: #fafafa; color: #312e81; box-shadow: 0 0 0 1px var(--primary-purple); }
+
+    .inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    @media (max-width: 650px) { .inputs-grid { grid-template-columns: 1fr; } }
+    .input-box { border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; background: #f8fafc; }
+    .input-box input { border: none; background: transparent; font-size: 1.1rem; font-weight: 800; color: var(--text-main); width: 100%; outline: none; }
+    .counter-control { display: flex; align-items: center; gap: 1rem; width: 100%; justify-content: space-between; }
+    .counter-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
+    .checkbox-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 2rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+
+    .breakdown-card { background: #111827; color: white; border-radius: 16px; padding: 1.5rem; }
+    .breakdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .calc-tag { background: #064e3b; color: #34d399; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; font-size: 0.9rem; color: #d1d5db; }
+    .total-group-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #374151; border-bottom: 1px dashed #374151; margin: 1rem 0; padding: 1rem 0; font-size: 1.1rem; font-weight: 800; color: white; }
+    .split-footer-box { background: #1f2937; border-radius: 12px; padding: 1.25rem; text-align: center; }
+    .per-person-price { font-size: 2rem; font-weight: 900; color: #34d399; margin-bottom: 0.25rem; }
+
+    /* Ride Hub Chat Styles */
+    .chat-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; border: 1px solid var(--border-color); border-radius: 12px; background: var(--card-bg); overflow: hidden; min-height: 450px; }
+    @media (max-width: 768px) { .chat-layout { grid-template-columns: 1fr; } }
+    .chat-sidebar { border-right: 1px solid var(--border-color); background: var(--nav-bg); padding: 1rem; }
+    .group-item { padding: 0.75rem; border-radius: 8px; cursor: pointer; margin-bottom: 0.5rem; transition: background 0.2s; }
+    .group-item.active { background: var(--card-bg); border: 1px solid var(--primary-purple); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .chat-main-area { display: flex; flex-direction: column; justify-content: space-between; padding: 1.25rem; }
+    .chat-messages-box { flex: 1; overflow-y: auto; max-height: 280px; padding-right: 0.5rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+    .chat-bubble { max-width: 75%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; }
+    .chat-bubble.other { background: var(--nav-bg); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; }
+    .chat-bubble.me { background: var(--primary-purple); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .chat-input-row { display: flex; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+    .chat-input-row input { flex: 1; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); outline: none; font-size: 0.9rem; }
+
+    /* Buttons */
+    .btn-primary { background: var(--primary-purple); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-success { background: var(--accent-green); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-box { background: var(--card-bg); border-radius: 16px; padding: 2rem; width: 90%; max-width: 420px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="brand-section">
+        <div class="logo-icon"><i class="fa-solid fa-car"></i></div>
+        <div>
+          <div class="brand-title">Carpool-Campus <span class="demo-badge">Hackathon Demo</span></div>
+          <div class="university-name"><i class="fa-solid fa-building-columns"></i> Delhi Technological University (DTU)</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="sos-btn" onclick="toggleModal(true)"><i class="fa-solid fa-triangle-exclamation"></i> 1-Tap SOS</button>
+        <button class="icon-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+        <div class="user-profile">
+          <div class="avatar">AS</div>
+          <div class="user-info">
+            <span class="user-name">Aanya Sharma</span>
+            <span class="verified-tag"><i class="fa-solid fa-circle-check"></i> Verified Peer</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-item" onclick="switchTab('matcher', this)"><i class="fa-solid fa-route"></i> Route Matcher</button>
+      <button class="nav-item active" onclick="switchTab('pools', this)"><i class="fa-solid fa-car-side"></i> Vehicle Pools</button>
+      <button class="nav-item" onclick="switchTab('fare', this)"><i class="fa-solid fa-calculator"></i> Fare Splitter</button>
+      <button class="nav-item" onclick="switchTab('trip', this)"><i class="fa-solid fa-location-dot"></i> Live Trip</button>
+      <button class="nav-item" onclick="switchTab('chat', this)"><i class="fa-solid fa-comments"></i> Ride Hub Chat <span class="badge-count">3</span></button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Tab 1: Route Matcher -->
+      <div id="matcher" class="tab-pane">
+        <div class="spotlight-tag">Smart Route Matching</div>
+        <h2 class="content-heading">Smart Schedule & Route Matcher</h2>
+        <p class="content-subtext">Match automatically with campus peers traveling on your exact timetable and route[cite: 7].</p>
+
+        <div class="search-card-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.85rem; font-weight: 700;">Search Filters</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Campus Destination: <b>DTU Main Gate, Bawana</b></span>
+          </div>
+
+          <div class="search-grid-4">
+            <div class="form-group">
+              <label>STARTING AREA</label>
+              <input type="text" value="Noida Sector 62">
+            </div>
+            <div class="form-group">
+              <label>ARRIVAL TIMETABLE</label>
+              <select>
+                <option>Mon-Fri: 8:30 AM Arrival</option>
+                <option>Mon-Fri: 9:30 AM Arrival</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>POOL TYPE PREFERENCE</label>
+              <select>
+                <option>All Commute Types</option>
+                <option>Car Owners Only</option>
+                <option>Shared Cabs/Autos</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button class="btn-primary" style="width: 100%;" onclick="alert('Searching matching peers...')"><i class="fa-solid fa-magnifying-glass"></i> Find Peers</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sub-header">
+          <h3 style="font-size: 1.1rem; font-weight: 800;">Matched Commute Companions <span style="background: var(--primary-purple-bg); color: var(--primary-purple); font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 99px;">4 Matches</span></h3>
+          <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: 700;"><i class="fa-solid fa-rotate"></i> Auto-matching based on university domain[cite: 8]</span>
+        </div>
+
+        <div class="matcher-grid">
+          <div class="matcher-card">
+            <div class="matcher-user-header">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="matcher-avatar" alt="User">
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong style="font-size: 0.95rem;">Kabir Mehta</strong>
+                  <span class="rating-badge">4.9 ★ (28 rides)[cite: 8]</span>
+                </div>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">DTU - Computer Eng.[cite: 8]</span>
+              </div>
+            </div>
+            <div class="ride-details">
+              Route: <b>Noida Sec 62 ➔ DTU Main Gate</b><br>
+              Timetable: <b>8:30 AM</b><br>
+              Commute Mode: <span style="color: var(--primary-purple); font-weight: 700;">Honda City (3 Seats)</span>[cite: 8]
+            </div>
+            <div class="ride-footer">
+              <div>
+                <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">EST. FARE</span>
+                <span style="font-size: 1.1rem; font-weight: 900; color: var(--text-main);">₹80/person</span>[cite: 8]
+              </div>
+              <button class="btn-primary" onclick="alert('Connecting with Kabir Mehta...')">Connect / Pool</button>
+            </div>
+          </div>
+
+          <div class="matcher-card">
+            <div class="matcher-user-header">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100" class="matcher-avatar" alt="User">
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong style="font-size: 0.95rem;">Priya Nair</strong>
+                  <span class="rating-badge">5.0 ★ (14 rides)[cite: 8]</span>
+                </div>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">DTU - Electrical[cite: 8]</span>
+              </div>
+            </div>
+            <div class="ride-details">
+              Route: <b>Noida Sec 62 ➔ DTU Main Gate</b><br>
+              Timetable: <b>8:30 AM</b><br>
+              Commute Mode: <span style="color: var(--accent-green); font-weight: 700;">Shared Uber XL Squad</span>[cite: 8]
+            </div>
+            <div class="ride-footer">
+              <div>
+                <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">EST. FARE</span>
+                <span style="font-size: 1.1rem; font-weight: 900; color: var(--text-main);">₹95/person</span>[cite: 8]
+              </div>
+              <button class="btn-primary" onclick="alert('Connecting with Priya Nair...')">Connect / Pool</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Vehicle Pools -->
+      <div id="pools" class="tab-pane active">
+        <div class="spotlight-tag">Feature Spotlight</div>
+        <h2 class="content-heading">Pool Any Way You Like (Vehicle & Non-Vehicle Owners)</h2>
+        <p class="content-subtext">Whether you own a bike/car or take local transit daily, Carpool-Campus connects you to split costs effortlessly.</p>
+
+        <div class="options-grid">
+          <div class="option-card">
+            <span class="card-type-tag tag-purple">Car & Bike Owners</span>
+            <div class="card-icon icon-purple"><i class="fa-solid fa-car-side"></i></div>
+            <h3 class="card-title">Offer Spare Seats & Save Fuel</h3>
+            <p class="card-desc">Driving to college alone? List your empty seats for batchmates on your daily route and auto-calculate daily petrol splits.</p>
+            <a class="card-action" onclick="alert('Opening Seat Listing Form...')">Post empty seats &rarr;</a>
+          </div>
+
+          <div class="option-card">
+            <span class="card-type-tag tag-green">Non-Vehicle Owners</span>
+            <div class="card-icon icon-green"><i class="fa-solid fa-users"></i></div>
+            <h3 class="card-title">Group for Auto / Cab / E-Rickshaw</h3>
+            <p class="card-desc">Don't have a vehicle? Form a 3 to 4 student squad at metro stations or landmarks to share Uber/Auto fare evenly.</p>
+            <a class="card-action card-action-green" onclick="alert('Opening Squad Creator...')">Form Auto squad &rarr;</a>
+          </div>
+        </div>
+
+        <div class="section-sub-header">
+          <h3 style="font-size: 1.1rem; font-weight: 800;">Active Vehicle Rides Nearby</h3>
+          <button class="btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="alert('Create Squad Form')"><i class="fa-solid fa-plus"></i> Offer Seats / Create Squad</button>[cite: 6]
+        </div>
+
+        <div class="rides-grid">
+          <div class="ride-card">
+            <div class="ride-card-top">
+              <span class="ride-type-badge tag-purple">Car Owner</span>
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-purple);">2 Seats Left[cite: 6]</span>
+            </div>
+            <div class="ride-details">
+              <strong style="font-size: 0.95rem; color: var(--text-main);">Honda City Pool - Noida Sec 62</strong>[cite: 6]<br>
+              Leaves daily at 08:15 AM ➔ DTU Main Gate[cite: 6]
+            </div>
+            <div class="ride-footer">
+              <span style="font-size: 1.1rem; font-weight: 900; color: var(--primary-purple);">₹80 / seat</span>[cite: 6]
+              <button class="btn-primary" onclick="alert('Joined Pool Successfully!')">Join Pool</button>
+            </div>
+          </div>
+
+          <div class="ride-card">
+            <div class="ride-card-top">
+              <span class="ride-type-badge tag-green">Cab / Auto Group</span>
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--accent-green);">Needs 1 More[cite: 6]</span>
+            </div>
+            <div class="ride-details">
+              <strong style="font-size: 0.95rem; color: var(--text-main);">Uber XL Squad from Metro Gate 2</strong>[cite: 6]<br>
+              Leaves at 08:30 AM ➔ IIT Delhi Gate 1[cite: 6]
+            </div>
+            <div class="ride-footer">
+              <span style="font-size: 1.1rem; font-weight: 900; color: var(--accent-green);">~₹65 / person</span>[cite: 6]
+              <button class="btn-success" onclick="alert('Joined Squad Successfully!')">Join Squad</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Fare Splitter -->
+      <div id="fare" class="tab-pane">
+        <div class="section-header">
+          <div class="section-icon"><i class="fa-solid fa-coins"></i></div>
+          <div>
+            <h2 class="section-title">Automatic Fare & Expense Splitter</h2>
+            <p class="section-desc">Eliminates money-related friction with instant transparent per-person calculations.</p>
+          </div>
+        </div>
+
+        <span class="field-label">Select Transit Type</span>
+        <div class="transit-grid">
+          <div class="transit-card active" onclick="selectTransit('cab', this, 18)">
+            <i class="fa-solid fa-car"></i>
+            <span>Cab / Uber</span>
+          </div>
+          <div class="transit-card" onclick="selectTransit('auto', this, 12)">
+            <i class="fa-solid fa-motorcycle"></i>
+            <span>Auto / E-Rick</span>
+          </div>
+          <div class="transit-card" onclick="selectTransit('personal', this, 8)">
+            <i class="fa-solid fa-gas-pump"></i>
+            <span>Personal Car/Bike</span>
+          </div>
+        </div>
+
+        <div class="inputs-grid">
+          <div>
+            <span class="field-label">Commute Distance (KM)</span>
+            <div class="input-box">
+              <input type="number" id="distanceInput" value="18" oninput="calculateFare()">
+              <span class="input-unit">km</span>
+            </div>
+          </div>
+
+          <div>
+            <span class="field-label">Number of Passengers</span>
+            <div class="input-box">
+              <div class="counter-control">
+                <button class="counter-btn" onclick="updatePassengers(-1)">-</button>
+                <span class="counter-value" id="passengerCount">4</span>
+                <button class="counter-btn" onclick="updatePassengers(1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="tollCheckbox" onchange="calculateFare()">
+          <span>Include Highway Toll Tax (₹60)</span>
+        </label>
+
+        <div class="breakdown-card">
+          <div class="breakdown-header">
+            <span class="breakdown-title" style="font-size: 0.75rem; text-transform: uppercase; color: #9ca3af;">Live Breakdown</span>
+            <span class="calc-tag">Auto-Calculated</span>
+          </div>
+
+          <div class="breakdown-row">
+            <span>Estimated Base Fare</span>
+            <span id="baseFareText">₹324</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Toll / Extra Charges</span>
+            <span id="tollText">₹0</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Platform Safety Fee</span>
+            <span style="color: #34d399; font-weight: 700;">FREE (College Tier)</span>
+          </div>
+
+          <div class="total-group-row">
+            <span>Total Group Trip Cost</span>
+            <span id="totalCostText">₹324</span>
+          </div>
+
+          <div class="split-footer-box">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; text-transform: uppercase;">Each Person Pays</div>
+            <div class="per-person-price" id="perPersonText">₹81</div>
+            <div style="font-size: 0.8rem; color: #9ca3af;">Equal split among <span id="passengerLabel">4</span> verified peers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Live Trip -->
+      <div id="trip" class="tab-pane">
+        <div class="spotlight-tag">Safety Check-In</div>
+        <h2 class="content-heading">Live Trip Safety & GPS Tracking</h2>
+        <p class="content-subtext">Real-time trip location sharing and safety monitoring for campus commuters[cite: 1].</p>
+        <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; text-align: center; background: var(--nav-bg);">
+          <i class="fa-solid fa-map-location-dot" style="font-size: 3rem; color: var(--primary-purple); margin-bottom: 1rem;"></i>
+          <h3>Active Trip Tracking Link Generated</h3>
+          <p style="color: var(--text-muted); margin-top: 0.5rem;">Live location link shared with parents and college safety portal[cite: 1].</p>
+          <button class="btn-primary" style="margin-top: 1rem;" onclick="alert('Tracking link copied to clipboard!')"><i class="fa-solid fa-copy"></i> Copy Emergency Tracking Link</button>
+        </div>
+      </div>
+
+      <!-- Tab 5: Ride Hub Chat -->
+      <div id="chat" class="tab-pane">
+        <div class="chat-layout">
+          <div class="chat-sidebar">
+            <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); margin-bottom: 1rem; text-transform: uppercase;">Ride Groups</div>
+            
+            <div class="group-item active" onclick="switchGroup('8:00 AM Morning Pool', 'DTU Main Gate', '4 Verified Peers')">
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700;">
+                <span>8:00 AM Morning Pool</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">08:12 AM</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Aanya: Meet at Gate 2 Metro entrance</div>
+            </div>
+
+            <div class="group-item" onclick="switchGroup('5:15 PM Return Squad', 'Noida Sec 62', '3 Verified Peers')">
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700;">
+                <span>5:15 PM Return Squad</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Yesterday</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Rohan: Cab is booked for evening</div>
+            </div>
+          </div>
+
+          <div class="chat-main-area">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div>
+                  <h3 id="activeGroupTitle" style="font-size: 1rem; font-weight: 800;">8:00 AM Morning Pool</h3>
+                  <span id="activeGroupMeta" style="font-size: 0.75rem; color: var(--text-muted);">4 Verified Peers • Destination: DTU Main Gate</span>
+                </div>
+                <span style="background: #fef3c7; color: #d97706; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 99px;">Auto-expires in 6h</span>
+              </div>
+
+              <div class="chat-messages-box" id="chatMessages">
+                <div class="chat-bubble other">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #4f46e5; display: block; margin-bottom: 0.2rem;">Kabir Mehta</span>
+                  Hey guys! I'm reaching Noida Sec 62 Metro gate in 5 mins.
+                </div>
+                <div class="chat-bubble me">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #e0e7ff; display: block; margin-bottom: 0.2rem;">You (Aanya)</span>
+                  Great! I am near Pillar 42. Let's wait at the auto stand landmark.
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-row">
+              <input type="text" id="chatInput" placeholder="Type pickup landmark or message..." onkeypress="handleKeyPress(event)">
+              <button class="btn-primary" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- SOS Modal -->
+  <div class="modal-overlay" id="sosModal">
+    <div class="modal-box">
+      <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: var(--danger-red); margin-bottom: 1rem;"></i>
+      <h3>Emergency SOS Alert</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.5rem 0 1.5rem 0;">Live GPS coordinates sent to DTU Campus Security & emergency contacts[cite: 1].</p>
+      <button class="btn-primary" style="background: var(--danger-red); width: 100%;" onclick="toggleModal(false)">Dismiss Alert</button>
+    </div>
+  </div>
+
+  <script>
+    let ratePerKm = 18;
+    let passengers = 4;
+
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      element.classList.add('active');
+    }
+
+    function toggleTheme() { document.body.classList.toggle('dark-theme'); }
+    function toggleModal(show) { document.getElementById('sosModal').style.display = show ? 'flex' : 'none'; }
+
+    function selectTransit(type, cardElement, rate) {
+      document.querySelectorAll('.transit-card').forEach(card => card.classList.remove('active'));
+      cardElement.classList.add('active');
+      ratePerKm = rate;
+      calculateFare();
+    }
+
+    function updatePassengers(change) {
+      passengers = Math.max(1, passengers + change);
+      document.getElementById('passengerCount').innerText = passengers;
+      document.getElementById('passengerLabel').innerText = passengers;
+      calculateFare();
+    }
+
+    function calculateFare() {
+      const distance = parseFloat(document.getElementById('distanceInput').value) || 0;
+      const includeToll = document.getElementById('tollCheckbox').checked;
+      
+      const baseFare = Math.round(distance * ratePerKm);
+      const toll = includeToll ? 60 : 0;
+      const totalCost = baseFare + toll;
+      const perPerson = Math.round(totalCost / passengers);
+
+      document.getElementById('baseFareText').innerText = `₹${baseFare}`;
+      document.getElementById('tollText').innerText = `₹${toll}`;
+      document.getElementById('totalCostText').innerText = `₹${totalCost}`;
+      document.getElementById('perPersonText').innerText = `₹${perPerson}`;
+    }
+
+    function switchGroup(title, dest, peers) {
+      document.querySelectorAll('.group-item').forEach(item => item.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('activeGroupTitle').innerText = title;
+      document.getElementById('activeGroupMeta').innerText = `${peers} • Destination: ${dest}`;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      if (input.value.trim() !== '') {
+        const box = document.getElementById('chatMessages');
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble me';
+        bubble.innerHTML = `<span style="font-size: 0.75rem; font-weight: 700; color: #e0e7ff; display: block; margin-bottom: 0.2rem;">You (Aanya)</span>${input.value}`;
+        box.appendChild(bubble);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+
+    calculateFare();
+  </script>
+</body>
+</html>
